@@ -1,0 +1,264 @@
+﻿@model NextSol.VM.OrderVM
+@{
+    ViewData["Title"] = "Order";
+}
+<!-- [ breadcrumb ] start -->
+<div class="row">
+    <div class="col-md-12">
+        <a asp-controller="Order" asp-action="Index" class="btn btn-primary fa-pull-right " style="margin-left:30px"><i class="fa fa-plus-circle"></i>Orders</a>
+    </div>
+</div>
+<br />
+<div class="col-sm-12">
+    <div class="card">
+        <div class="card-header">
+            <h5>New Order </h5>
+            <hr>
+        </div>
+        <div class="card-body ">
+                <form asp-action="Save" asp-controller="Order" method="post">
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label for="example-text-input" class=" col-form-label">Order No</label>
+                        <input asp-for="OrderMaster.OrderId" type="number" readonly class="form-control" autocomplete="off" />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="example-text-input" class=" col-form-label">Order Date</label>
+                        <input asp-for="OrderMaster.OrderDate" type="date" value="@Model.OrderMaster.OrderDate.ToString("yyyy-MM-dd")" class="form-control" autocomplete="off" />   
+                    </div>
+                    <div class="col-md-4">
+                        <label for="example-text-input" class=" col-form-label">Required Date</label>
+                        <input asp-for="OrderMaster.RequiredDate" type="date" value="@Model.OrderMaster.RequiredDate.ToString("yyyy-MM-dd")" class="form-control" autocomplete="off" />
+                    </div>
+                    <div class="col-md-6">
+                        <br />
+                        <label for="example-text-input" class=" col-form-label">Select Customer</label>
+                        <select class="form-control" onclick="Action(this.value)" required asp-for="OrderMaster.CustomerId" asp-items="@(new SelectList(Model.Custlist,"Id","Name"))">
+                            <option selected hidden value="0">Select</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <br />
+                        <label for="example-text-input" class=" col-form-label">Shiping Address</label>
+                        <textarea asp-for="OrderMaster.ShipingAddress" class="form-control" id="ShipingAddress"></textarea>
+                    </div>
+                    <div class="col-md-3">
+                        <br />
+                        <label>Name</label>
+                        <input class="form-control" autocomplete="off" id="ItemName" type="text">
+                    </div>
+                    <div class="col-md-2">
+                        <br />
+                        <label>Qty</label>
+                        <input class="form-control" autocomplete="off" id="qty" value="0" onkeyup="getPrice()" type="number" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)">
+                    </div>
+                    <div class="col-md-3">
+                        <br />
+                        <label>Price</label>
+                        <input class="form-control" autocomplete="off" id="CP" value="0" onkeyup="getPrice()" type="number">
+                    </div>
+                    <div class="col-md-3">
+                        <br />
+                        <label> Total</label>
+                        <input readonly class="form-control" autocomplete="off" type="text" id="nettotal">
+                    </div>
+                    <div class="col-md-1 ">
+                        <br />
+                        <button type="button" style="margin-top: 28px;" onclick='abc()' class="btn btn-primary">Add</button>
+                    </div>
+
+                    <div class="col-md-12">
+                        <br />
+                        <table id="invoiceItem" class="mb-0 table  table-bordered table-hover" style="">
+                            <tr class="bg-primary text-white">
+                                <th>Action</th>
+                                <th>Name</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                            @if (Model.OrderMaster.Id == 0)
+                            {
+                                <tbody>
+                                </tbody>
+                            }
+                            else
+                            {
+                                <tbody>
+                                    @foreach (var lst in Model.OrderDetails)
+                                    {
+                                        <tr>
+
+                                            <td style="width:80px !important"><a style=color:white;background-color:red; class=badge badge-warning onclick=deleteRow(this)>Delete</a>&nbsp;<a class="badge badge-primary" onclick="return ShowEditModal(this)">Edit</a></td>
+
+                                            <td><input type="text" name="ItemName" value="@lst.ItemName" readonly Class="form-control" /></td>
+
+                                            <td><input type="text" name="qty" value="@lst.Qty" readonly Class="form-control total" /></td>
+
+                                            <td><input type="text" name="CP" value="@lst.Price" readonly Class="form-control total" /></td>
+
+                                            <td><input type="text" name="nettotal" value="@lst.Total" readonly Class="form-control total" /></td>
+
+                                            <td style="display:none">@lst.ItemName</td>
+
+                                            <td style="display:none">@lst.Qty</td>
+
+                                            <td style="display:none">@lst.Price</td>
+
+                                            <td style="display:none">@lst.Total</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            }
+
+                        </table>
+                    </div>
+                    <div class="col-md-4">
+                        <br />
+                        <label for="example-text-input" class=" col-form-label">Net Total</label>
+                        <input asp-for="OrderMaster.NeTotal" type="number" class="form-control" readonly autocomplete="off" id="total" onkeyup="gt()" />
+                    </div>
+                    <div class="col-md-4">
+                        <br />
+                        <label for="example-text-input" class=" col-form-label">Discount</label>
+                        <input asp-for="OrderMaster.Discount" type="number" class="form-control"  autocomplete="off" id="Discount" onkeyup="gt()" />
+                    </div>
+                    <div class="col-md-4">
+                        <br />
+                        <label for="example-text-input" class=" col-form-label">Grand Total</label>
+                        <input asp-for="OrderMaster.Gtotal" type="number" class="form-control" autocomplete="off" readonly id="granttotal" onkeyup="gt()" />
+                    </div>
+                    <div class="offset-md-5 col-md-5 " style="margin-top:20px">
+                        @if (Model.OrderMaster.Id == 0)
+                        {
+                            <button type="submit" class="btn btn-primary pull-right col-md-5" style="margin-top:0px"><i class="fa fa-check"></i> Save </button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-primary pull-right col-md-5" style="margin-top:0px"><i class="fa fa-check"></i> Update </button>
+                        }
+                    </div>
+                </div>
+                <input asp-for="OrderMaster.Id" type="hidden" />
+                </form>
+            </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    //This Function call The Addition of Rows
+    function abc() {
+        //Appending the Colums By Same Id
+        var ItemName = document.getElementById("ItemName").value;
+        var CP = document.getElementById("CP").value;
+        var qty = document.getElementById("qty").value;
+        var nettotal = document.getElementById("nettotal").value;
+        if (ItemName == "" || ItemName == 0) {
+            alert("Please Select Item");
+        }
+        else if (CP == "" || CP == 0) {
+
+            alert("Please Enter Cost Price");
+        }
+        else if (qty == "" || qty == 0) {
+
+            alert("Please Enter Quantity");
+        }
+        else {
+            var htmlrows = '';
+            htmlrows += '<tr>';
+            htmlrows += '<td style="width:80px !important"><a  style=color:white;background-color:red; class=badge badge-warning    onclick=deleteRow(this)>Delete</a>&nbsp;<a class="badge badge-primary" onclick="return ShowEditModal(this)" >Edit</a></td>'
+            htmlrows += '<td><input type="text" name="ItemName" value="' + ItemName + '"  readonly Class="form-control" /></td>'
+            htmlrows += '<td><input type="text"  name="qty" value="' + qty + '"  readonly Class="form-control " /></td>'
+            htmlrows += '<td><input type="text"  name="CP" value="' + CP + '"  readonly Class="form-control " /></td>'
+            htmlrows += '<td><input type="text"  name="nettotal" value="' + nettotal + '"  readonly Class="form-control " /></td>'
+            htmlrows += '<td style="display:none">' + ItemName + '</td>'
+            htmlrows += '<td style="display:none">' + qty + '</td>'
+            htmlrows += '<td style="display:none">' + CP + '</td>'
+            htmlrows += '<td style="display:none">' + nettotal + '</td>'
+            htmlrows += '</tr>';
+            $('#invoiceItem').append(htmlrows);
+            //Clearing the Text Boxes After adding..
+            $('#ItemName').val('');
+            $('#CP').val('0'); //add this line
+            $('#qty').val('0'); //add this line
+            $('#nettotal').val('0'); //add this line
+        }
+        //Total Function
+        var table = document.getElementById("invoiceItem"), sumVal = 0;
+        for (var i = 1; i < table.rows.length; i++) {
+            sumVal = sumVal + parseFloat(table.rows[i].cells[8].innerHTML);
+        }
+        document.getElementById("total").value = sumVal.toFixed(2);
+        document.getElementById("granttotal").value = sumVal.toFixed(2);
+
+        var numval1 = parseFloat(document.getElementById("total").value || 0);
+        var numval2 = parseFloat(document.getElementById("Discount").value || 0);
+        var t_f = parseFloat(numval1).toFixed(2) - parseFloat(numval2).toFixed(2);
+        if (!isNaN(t_f)) {
+            document.getElementById("granttotal").value = t_f.toFixed(2);
+        }
+
+    }
+    //Delete The Rows.
+    function deleteRow(btn) {
+        if (confirm("Are you sure want to delete the row?"))
+            $(btn).closest("tr").remove();
+        var table = document.getElementById("invoiceItem"), sumVal = 0;
+        for (var i = 1; i < table.rows.length; i++) {
+            sumVal = sumVal + parseFloat(table.rows[i].cells[8].innerHTML);
+        }
+        document.getElementById("total").value = sumVal.toFixed(2);
+        document.getElementById("granttotal").value = sumVal.toFixed(2);
+
+        var numval1 = parseFloat(document.getElementById("total").value || 0);
+        var numval2 = parseFloat(document.getElementById("Discount").value || 0);
+        var t_f = parseFloat(numval1).toFixed(2) - parseFloat(numval2).toFixed(2);
+        if (!isNaN(t_f)) {
+            document.getElementById("granttotal").value = t_f.toFixed(2);
+        }
+    }
+    function ShowEditModal(button) {
+        if (confirm("Are you sure want to Edit the row?"))
+            var $row = $(button).closest('tr');
+        var col2 = $row.find("td:eq(5)").html();
+        var col5 = $row.find("td:eq(6)").html();
+        var col6 = $row.find("td:eq(7)").html();
+        var col7 = $row.find("td:eq(8)").html();
+        document.getElementById("ItemName").value = col2;
+        document.getElementById("qty").value = col5;
+        document.getElementById("CP").value = col6;
+        document.getElementById("nettotal").value = col7;
+        $(button).closest("tr").remove();
+        var table = document.getElementById("invoiceItem"), sumVal = 0;
+        for (var i = 1; i < table.rows.length; i++) {
+            sumVal = sumVal + parseFloat(table.rows[i].cells[8].innerHTML);
+        }
+        //alert(sumVal);
+        document.getElementById("total").value = sumVal.toFixed(2);
+        document.getElementById("granttotal").value = sumVal.toFixed(2);
+        var numval1 = parseFloat(document.getElementById("total").value || 0);
+        var numval2 = parseFloat(document.getElementById("Discount").value || 0);
+        var t_f = parseFloat(numval1).toFixed(2) - parseFloat(numval2).toFixed(2);
+        if (!isNaN(t_f)) {
+            document.getElementById("granttotal").value = t_f.toFixed(2);
+        }
+    }
+    function gt() {
+        var numval1 = parseFloat(document.getElementById("total").value || 0);
+        var numval2 = parseFloat(document.getElementById("Discount").value || 0);
+        var t_f = parseFloat(numval1).toFixed(2) - parseFloat(numval2).toFixed(2);
+        if (!isNaN(t_f)) {
+            document.getElementById("granttotal").value = t_f.toFixed(2);
+        }
+    };
+    function getPrice() {
+        var numval1 = parseFloat(document.getElementById("qty").value || 0);
+        var numval2 = parseFloat(document.getElementById("CP").value || 0);
+        var t_f = parseFloat(numval1).toFixed(2) * parseFloat(numval2).toFixed(2);
+        if (!isNaN(t_f)) {
+            document.getElementById("nettotal").value = t_f.toFixed(2);
+        }
+    };
+    
+</script>

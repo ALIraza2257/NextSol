@@ -1,0 +1,90 @@
+﻿@model NextSol.Models.Customer
+@{
+    ViewData["Title"] = "Customer";
+}
+<!-- [ breadcrumb ] start -->
+<div class="row">
+    <div class="col-md-12">
+        <a asp-controller="Customer" asp-action="Index" class="btn btn-primary fa-pull-right " style="margin-left:30px"><i class="fa fa-plus-circle"></i>Customers</a>
+    </div>
+</div>
+<br />
+<div class="col-sm-12">
+    <div class="card">
+        <div class="card-header">
+            <h5>New Customer </h5>
+            <hr>
+        </div>
+        <div class="card-body ">
+            @using (Html.BeginForm("Save", "Customer", FormMethod.Post))
+            {
+            <div class="form-group row">
+                <div class="col-md-4">
+                    <label for="example-text-input" class=" col-form-label">Customer Name</label>
+                    <input asp-for="Name" class="form-control" required autocomplete="off" />
+                </div>
+                <div class="col-md-4">
+                    <label for="example-text-input" class=" col-form-label">Company Name</label>
+                    <input asp-for="CompanyName" class="form-control" required autocomplete="off" />
+                </div>
+                <div class="col-md-4">
+                    <label for="example-text-input" class=" col-form-label">Contact Name</label>
+                    <input asp-for="ContactName" class="form-control" autocomplete="off" />
+                </div>
+                <div class="col-md-4">
+                    <label for="example-text-input" class=" col-form-label">Contact Title</label>
+                    <input asp-for="ContactTitle" class="form-control" autocomplete="off" />
+                </div>
+                <div class="col-md-4">
+                    <label for="example-text-input" class=" col-form-label">Postal Code</label>
+                    <input asp-for="PostalCode" class="form-control" autocomplete="off" />
+                </div>
+                <div class="col-md-4">
+                    <label for="example-text-input" class=" col-form-label">Phone</label>
+                    <input asp-for="Phone" type="number" class="form-control" autocomplete="off" />
+                </div>
+                <div class="col-md-4">
+                    <label for="example-text-input" class=" col-form-label">Fax</label>
+                    <input asp-for="Fax" type="number" class="form-control" autocomplete="off" />
+                </div>
+                <div class="col-md-4">
+                    <label for="example-text-input" class=" col-form-label">Region</label>
+                    <input asp-for="Region" class="form-control" autocomplete="off" />
+                </div>
+                <div class="col-md-4">
+                    <label for="example-text-input" class=" col-form-label">City</label>
+                    <input asp-for="City" class="form-control" autocomplete="off" />
+                </div>
+                <div class="col-md-4">
+                    <label for="example-text-input" class=" col-form-label">Country</label>
+                    <input asp-for="Country" class="form-control" autocomplete="off" />
+                </div>
+                <div class="col-md-4">
+                    <label for="example-text-input" class=" col-form-label">Address</label>
+                    <textarea asp-for="Address" class="form-control"></textarea>
+                </div>
+                
+                <div class="offset-md-5 col-md-5 " style="margin-top:20px">
+                    @if (Model.Id == 0)
+                    {
+                        <button type="submit" class="btn btn-primary pull-right col-md-5" style="margin-top:0px"><i class="fa fa-check"></i> Save </button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn btn-primary pull-right col-md-5" style="margin-top:0px"><i class="fa fa-check"></i> Update </button>
+                    }
+                </div>
+            </div>
+                <input asp-for="Id" type="hidden"  />
+            }
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
